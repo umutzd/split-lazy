@@ -1,4 +1,4 @@
-import { splitLazy } from '../src';
+import { splitLazy, splitLazyString } from '../src';
 
 describe('SYNC', () => {
   describe('splitting a string', () => {
@@ -82,6 +82,33 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual([1, 3]);
       expect(iterable.next().value).toEqual([7, 9]);
       expect(iterable.next().value).toEqual([]);
+    });
+  });
+
+  describe.only('splitting a string with splitLazyString', () => {
+    it('yields with iterable of splitted parts', () => {
+      const str = 'test/1';
+      const iterable = splitLazyString(str, '/');
+
+      expect(iterable.next().value).toEqual('test');
+      expect(iterable.next().value).toEqual('1');
+    });
+
+    it('should return empty array first if given sub iterable is found in the beginning of iterable', () => {
+      const str = 'test/1';
+      const iterable = splitLazyString(str, 't');
+
+      expect(iterable.next().value).toEqual('');
+      expect(iterable.next().value).toEqual('es');
+      expect(iterable.next().value).toEqual('/1');
+    });
+
+    it('should return empty array last if given separator is found in the end of iterable', () => {
+      const str = 'test/1';
+      const iterable = splitLazyString(str, '1');
+
+      expect(iterable.next().value).toEqual('test/');
+      expect(iterable.next().value).toEqual('');
     });
   });
 });
