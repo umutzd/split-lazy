@@ -1,10 +1,4 @@
-import { isAsyncIterable } from './utils';
-
-export async function* asyncJoinAll(iterable: AsyncIterable<string[]>) {
-  for await (const el of iterable) {
-    yield el.join('');
-  }
-}
+import { isAsyncIterable, isIterable } from './utils';
 
 export async function* asyncSplitLazyWithSeparator<
   I,
@@ -24,15 +18,35 @@ export async function* asyncSplitLazyWithSeparator<
   yield yieldNext;
 }
 
+export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
+  iterable: T,
+  subIterable: T
+): AsyncGenerator<I[], void, void>;
+export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
+  iterable: T,
+  subIterable: I
+): AsyncGenerator<I[], void, void>;
+export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
+  iterable: T,
+  subIterable: Iterable<I>
+): AsyncGenerator<I[], void, void>;
 export async function* asyncSplitLazyWithSubIterator<
   I,
   T extends AsyncIterable<I>
->(iterable: T, subIterable: T) {
+>(iterable: T, subIterable: unknown) {
   let yieldNext: I[] = [];
   let subIterableItems = [];
 
-  for await (const item of subIterable) {
-    subIterableItems.push(item);
+  if (isIterable(subIterable)) {
+    for (const item of subIterable) {
+      subIterableItems.push(item);
+    }
+  }
+
+  if (isAsyncIterable(subIterable)) {
+    for await (const item of subIterable) {
+      subIterableItems.push(item);
+    }
   }
 
   let foundSubIterator = 0;
@@ -63,16 +77,29 @@ export async function* asyncSplitLazyWithSubIterator<
 export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: T
-): AsyncGenerator<I[], void, unknown>;
+): AsyncGenerator<I[], void, void>;
+export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
+  iterable: T,
+  separator: Iterable<I>
+): AsyncGenerator<I[], void, void>;
 export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: I
-): AsyncGenerator<I[], void, unknown>;
+): AsyncGenerator<I[], void, void>;
 export async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: unknown
 ) {
   if (isAsyncIterable(separator)) {
+    for await (const value of asyncSplitLazyWithSubIterator(
+      iterable,
+      separator
+    )) {
+      yield value;
+    }
+  }
+
+  if (isIterable(separator)) {
     for await (const value of asyncSplitLazyWithSubIterator(
       iterable,
       separator
