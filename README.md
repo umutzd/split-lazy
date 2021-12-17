@@ -1,5 +1,9 @@
 # split-lazy 🗡🦭
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ae3028bdccea48bf9a7b05ed91284fbd)](https://www.codacy.com/gh/miyavsu-limited/split-lazy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=miyavsu-limited/split-lazy&amp;utm_campaign=Badge_Grade)
+![Codacy coverage](https://img.shields.io/codacy/coverage/ae3028bdccea48bf9a7b05ed91284fbd)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/split-lazy)
+
 This package provides ways to split arrays, strings or other iterables (sync and async) lazily. It returns an iterable that calculates the result lazily (while iterating on it).
 
 [👉 Learn more about iterators here.][iterators]
