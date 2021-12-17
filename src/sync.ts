@@ -75,5 +75,11 @@ export function splitLazy<I, T extends Iterable<I>>(
 }
 
 export function splitLazyString(iterable: string, separator: string) {
-  return joinAll(splitLazyWithSubIterator(iterable, separator));
+  return joinAll(
+    splitLazyWithSubIterator(iterable, separator) as Generator<
+      string[],
+      void,
+      void
+    >
+  );
 }
