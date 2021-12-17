@@ -10,7 +10,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual(['1']);
     });
 
-    it('should return empty array first if given separator is found in the beginning of iterable', () => {
+    it('should yield empty array first if given separator is found in the beginning of iterable', () => {
       const str = '/test/1';
       const iterable = splitLazy(str, '/');
 
@@ -19,7 +19,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual(['1']);
     });
 
-    it('should return empty array last if given separator is found in the end of iterable', () => {
+    it('should yield empty array last if given separator is found in the end of iterable', () => {
       const str = 'test/1/';
       const iterable = splitLazy(str, '/');
 
@@ -38,7 +38,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual([7, 9]);
     });
 
-    it('should return empty array first if given separator is found in the beginning of iterable', () => {
+    it('should yield empty array first if given separator is found in the beginning of iterable', () => {
       const arr = [5, 1, 3, 5, 7, 9];
       const iterable = splitLazy(arr, 5);
 
@@ -47,7 +47,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual([7, 9]);
     });
 
-    it('should return empty array last if given separator is found in the end of iterable', () => {
+    it('should yield empty array last if given separator is found in the end of iterable', () => {
       const arr = [1, 3, 5, 7, 9, 5];
       const iterable = splitLazy(arr, 5);
 
@@ -66,7 +66,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual([9, 11]);
     });
 
-    it('should return empty array first if given sub iterable is found in the beginning of iterable', () => {
+    it('should yield empty array first if given sub iterable is found in the beginning of iterable', () => {
       const arr = [5, 4, 1, 3, 5, 4, 7, 9];
       const iterable = splitLazy(arr, [5, 4]);
 
@@ -75,7 +75,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual([7, 9]);
     });
 
-    it('should return empty array last if given separator is found in the end of iterable', () => {
+    it('should yield empty array last if given separator is found in the end of iterable', () => {
       const arr = [1, 3, 5, 4, 7, 9, 5, 4];
       const iterable = splitLazy(arr, [5, 4]);
 
@@ -94,7 +94,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual('1');
     });
 
-    it('should return empty array first if given sub iterable is found in the beginning of iterable', () => {
+    it('should yield empty array first if given sub iterable is found in the beginning of iterable', () => {
       const str = 'test/1';
       const iterable = splitLazyString(str, 't');
 
@@ -103,7 +103,7 @@ describe('SYNC', () => {
       expect(iterable.next().value).toEqual('/1');
     });
 
-    it('should return empty array last if given separator is found in the end of iterable', () => {
+    it('should yield empty array last if given separator is found in the end of iterable', () => {
       const str = 'test/1';
       const iterable = splitLazyString(str, '1');
 
