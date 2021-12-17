@@ -9,7 +9,7 @@ async function* dummyGenerator() {
 }
 
 describe('ASYNC', () => {
-  describe('splitting an array', () => {
+  describe('splitting an async iterator', () => {
     it('yields with array of splitted items correctly', async () => {
       const iterable = dummyGenerator();
       const result = asyncSplitLazy(iterable, 5);
@@ -38,7 +38,7 @@ describe('ASYNC', () => {
     });
   });
 
-  describe('splitting an array with sub array', () => {
+  describe('splitting an async iterator with sub array', () => {
     it('yields with array of splitted items correctly', async () => {
       const iterable = dummyGenerator();
       const result = asyncSplitLazy(iterable, [5, 7]);
