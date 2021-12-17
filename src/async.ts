@@ -6,10 +6,10 @@ export async function* asyncJoinAll(iterable: AsyncIterable<string[]>) {
   }
 }
 
-export async function* asyncSplitWithSeparator<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  separator: I
-) {
+export async function* asyncSplitLazyWithSeparator<
+  I,
+  T extends AsyncIterable<I>
+>(iterable: T, separator: I) {
   let yieldNext: I[] = [];
 
   for await (const item of iterable) {
@@ -24,10 +24,10 @@ export async function* asyncSplitWithSeparator<I, T extends AsyncIterable<I>>(
   yield yieldNext;
 }
 
-export async function* asyncSplitWithSubIterator<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  subIterable: T
-) {
+export async function* asyncSplitLazyWithSubIterator<
+  I,
+  T extends AsyncIterable<I>
+>(iterable: T, subIterable: T) {
   let yieldNext: I[] = [];
   let subIterableItems = [];
 
@@ -73,12 +73,15 @@ export async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   separator: unknown
 ) {
   if (isAsyncIterable(separator)) {
-    for await (const value of asyncSplitWithSubIterator(iterable, separator)) {
+    for await (const value of asyncSplitLazyWithSubIterator(
+      iterable,
+      separator
+    )) {
       yield value;
     }
   }
 
-  for await (const value of asyncSplitWithSeparator(iterable, separator)) {
+  for await (const value of asyncSplitLazyWithSeparator(iterable, separator)) {
     yield value;
   }
 }

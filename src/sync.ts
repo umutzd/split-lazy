@@ -6,7 +6,7 @@ export function* joinAll(iterable: Iterable<string[]>) {
   }
 }
 
-export function* splitWithSeparator<I, T extends Iterable<I>>(
+export function* splitLazyWithSeparator<I, T extends Iterable<I>>(
   iterable: T,
   separator: I
 ) {
@@ -24,7 +24,7 @@ export function* splitWithSeparator<I, T extends Iterable<I>>(
   yield yieldNext;
 }
 
-export function* splitWithSubIterator<I, T extends Iterable<I>>(
+export function* splitLazyWithSubIterator<I, T extends Iterable<I>>(
   iterable: T,
   subIterable: T
 ) {
@@ -68,12 +68,12 @@ export function splitLazy<I, T extends Iterable<I>>(
   separator: unknown
 ) {
   if (isIterable(separator)) {
-    return splitWithSubIterator(iterable, separator);
+    return splitLazyWithSubIterator(iterable, separator);
   }
 
-  return splitWithSeparator(iterable, separator);
+  return splitLazyWithSeparator(iterable, separator);
 }
 
 export function splitLazyString(iterable: string, separator: string) {
-  return joinAll(splitWithSubIterator(iterable, separator));
+  return joinAll(splitLazyWithSubIterator(iterable, separator));
 }
