@@ -57,7 +57,7 @@ describe('SYNC', () => {
     });
   });
 
-  describe.only('splitting an array with sub array', () => {
+  describe('splitting an array with sub array', () => {
     it('yields with array of splitted items correctly', () => {
       const arr = [1, 3, 5, 7, 9, 11];
       const iterable = splitLazy(arr, [5, 7]);
@@ -85,7 +85,7 @@ describe('SYNC', () => {
     });
   });
 
-  describe.only('splitting a string with splitLazyString', () => {
+  describe('splitting a string with splitLazyString', () => {
     it('yields with iterable of splitted parts', () => {
       const str = 'test/1';
       const iterable = splitLazyString(str, '/');
