@@ -61,7 +61,7 @@ export async function* asyncSplitLazyWithSubIterator<
 export async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: unknown
-): AsyncGenerator<I[], void, unknown> {
+): AsyncGenerator<I[], void, void> {
   if (isAsyncIterable(separator) || isIterable(separator)) {
     for await (const value of asyncSplitLazyWithSubIterator(
       iterable,
