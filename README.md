@@ -27,6 +27,8 @@ function splitLazy<I, T extends Iterable<I>>(
 
 First argument is iterable to search inside and split. Second argument is either an iterable or an element to look for in the given first argument.
 
+`separator` can be an `Iterable` or anything else as an element. If separator is an iterable, it will be searched as a sub iterator.
+
 ### Examples
 
 ```ts
@@ -96,7 +98,9 @@ async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
 ): AsyncGenerator<I[], void, void>
 ```
 
-Same applies for `AsyncIterable<T>`. Note that if you provide an `AsyncIterable<T>` instead of `T` (an element) as a separator, `asyncSplitLazy` fully serializes it into an array before it starts searching for it in the first argument (`iterable`).
+Iterable can be an `AsyncIterable`. Separator can be an `Iterable`, `AsyncIterable` or anything else as an element. If `separator` is an iterable, it will be searched as a sub iterator.
+
+Note that if `separator` argument is an `AsyncIterable`, `asyncSplitLazy` fully iterates the given separator before it starts searching for it in the first argument (`iterable`).
 
 ## Contributing
 
