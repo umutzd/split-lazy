@@ -19,14 +19,10 @@ npm install split-lazy
 ## `splitLazy`
 
 ```ts
-export function splitLazy<I, T extends Iterable<I>>(
+function splitLazy<I, T extends Iterable<I>>(
   iterable: T,
-  separator: T
-): Generator<I[], void, void>;
-export function splitLazy<I, T extends Iterable<I>>(
-  iterable: T,
-  separator: I
-): Generator<I[], void, void>;
+  separator: unknown
+): Generator<I[], void, void>
 ```
 
 First argument is iterable to search inside and split. Second argument is either an iterable or an element to look for in the given first argument.
@@ -94,14 +90,10 @@ expect(iterable.next().value).toEqual([9, 11]); // ✅
 ## `asyncSplitLazy`
 
 ```ts
-export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
+async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
-  separator: T
-): AsyncGenerator<I[], void, unknown>;
-export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  separator: I
-): AsyncGenerator<I[], void, unknown>;
+  separator: unknown
+): AsyncGenerator<I[], void, void>
 ```
 
 Same applies for `AsyncIterable<T>`. Note that if you provide an `AsyncIterable<T>` instead of `T` (an element) as a separator, `asyncSplitLazy` fully serializes it into an array before it starts searching for it in the first argument (`iterable`).

@@ -15,6 +15,35 @@ function* dummyGenerator() {
 }
 
 describe('SYNC', () => {
+  describe('splitting an array', () => {
+    it('yields with array of splitted items correctly', () => {
+      const arr = [1, 3, 5, 7, 9];
+      const iterable = splitLazy(arr, 5);
+
+      expect(iterable.next().value).toEqual([1, 3]);
+      expect(iterable.next().value).toEqual([7, 9]);
+      expect(iterable.next().value).toEqual(undefined);
+    });
+
+    it('should yield empty array first if given separator is found in the beginning of iterable', () => {
+      const arr = [1, 3, 5, 7, 9];
+      const iterable = splitLazy(arr, 1);
+
+      expect(iterable.next().value).toEqual([]);
+      expect(iterable.next().value).toEqual([3, 5, 7, 9]);
+      expect(iterable.next().value).toEqual(undefined);
+    });
+
+    it('should yield empty array last if given separator is found in the end of iterable', () => {
+      const arr = [1, 3, 5, 7, 9];
+      const iterable = splitLazy(arr, 9);
+
+      expect(iterable.next().value).toEqual([1, 3, 5, 7]);
+      expect(iterable.next().value).toEqual([]);
+      expect(iterable.next().value).toEqual(undefined);
+    });
+  });
+
   describe('splitting an iterator', () => {
     it('yields with array of splitted items correctly', () => {
       const iterable = dummyGenerator();
