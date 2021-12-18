@@ -32,37 +32,31 @@ export function* splitLazyWithSubIterator<I, T extends Iterable<I>>(
   let subIterableItems = Array.from(subIterable);
   let foundSubIterator = 0;
 
-  const iterator = iterable[Symbol.iterator]();
-
-  let next = iterator.next();
-
-  while (!next.done) {
-    if (next.value === subIterableItems[foundSubIterator]) {
-      foundSubIterator++;
-
-      if (subIterableItems.length === foundSubIterator) {
+  for (const item of iterable) {
+    if (item === subIterableItems[foundSubIterator]) {
+      if (subIterableItems.length - 1 === foundSubIterator) {
         yield yieldNext;
         yieldNext = [];
+        foundSubIterator = 0;
+      } else {
+        foundSubIterator++;
       }
     } else {
-      foundSubIterator = 0;
-      yieldNext.push(next.value);
-    }
+      if (foundSubIterator > 0) {
+        yieldNext = yieldNext.concat(
+          subIterableItems.slice(0, foundSubIterator)
+        );
 
-    next = iterator.next();
+        foundSubIterator = 0;
+      }
+
+      yieldNext.push(item);
+    }
   }
 
   yield yieldNext;
 }
 
-export function splitLazy<I, T extends Iterable<I>>(
-  iterable: T,
-  separator: T
-): Generator<I[], void, void>;
-export function splitLazy<I, T extends Iterable<I>>(
-  iterable: T,
-  separator: I
-): Generator<I[], void, void>;
 export function splitLazy<I, T extends Iterable<I>>(
   iterable: T,
   separator: unknown

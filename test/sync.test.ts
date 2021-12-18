@@ -1,114 +1,156 @@
 import { splitLazy, splitLazyString } from '../src';
 
+function* dummyGenerator() {
+  yield 1;
+  yield 3;
+  yield 5;
+  yield 7;
+  yield 9;
+  yield 11;
+  yield 5;
+  yield 7;
+  yield 13;
+  yield 7;
+  yield 9;
+}
+
 describe('SYNC', () => {
-  describe('splitting a string', () => {
+  describe('splitting an iterator', () => {
     it('yields with array of splitted items correctly', () => {
-      const str = 'test/1';
-      const iterable = splitLazy(str, '/');
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, 5);
 
-      expect(iterable.next().value).toEqual(['t', 'e', 's', 't']);
-      expect(iterable.next().value).toEqual(['1']);
+      expect(result.next().value).toEqual([1, 3]);
+      expect(result.next().value).toEqual([7, 9, 11]);
+      expect(result.next().value).toEqual([7, 13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
     it('should yield empty array first if given separator is found in the beginning of iterable', () => {
-      const str = '/test/1';
-      const iterable = splitLazy(str, '/');
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, 1);
 
-      expect(iterable.next().value).toEqual([]);
-      expect(iterable.next().value).toEqual(['t', 'e', 's', 't']);
-      expect(iterable.next().value).toEqual(['1']);
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual([3, 5, 7, 9, 11, 5, 7, 13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
     it('should yield empty array last if given separator is found in the end of iterable', () => {
-      const str = 'test/1/';
-      const iterable = splitLazy(str, '/');
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, 9);
 
-      expect(iterable.next().value).toEqual(['t', 'e', 's', 't']);
-      expect(iterable.next().value).toEqual(['1']);
-      expect(iterable.next().value).toEqual([]);
+      expect(result.next().value).toEqual([1, 3, 5, 7]);
+      expect(result.next().value).toEqual([11, 5, 7, 13, 7]);
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual(undefined);
     });
   });
 
-  describe('splitting an array', () => {
+  describe('splitting an iterator with sub array', () => {
     it('yields with array of splitted items correctly', () => {
-      const arr = [1, 3, 5, 7, 9];
-      const iterable = splitLazy(arr, 5);
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, [5, 7]);
 
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([7, 9]);
+      expect(result.next().value).toEqual([1, 3]);
+      expect(result.next().value).toEqual([9, 11]);
+      expect(result.next().value).toEqual([13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
     it('should yield empty array first if given separator is found in the beginning of iterable', () => {
-      const arr = [5, 1, 3, 5, 7, 9];
-      const iterable = splitLazy(arr, 5);
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, [1, 3]);
 
-      expect(iterable.next().value).toEqual([]);
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([7, 9]);
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual([5, 7, 9, 11, 5, 7, 13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
     it('should yield empty array last if given separator is found in the end of iterable', () => {
-      const arr = [1, 3, 5, 7, 9, 5];
-      const iterable = splitLazy(arr, 5);
+      const iterable = dummyGenerator();
+      const result = splitLazy(iterable, [7, 9]);
 
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([7, 9]);
-      expect(iterable.next().value).toEqual([]);
+      expect(result.next().value).toEqual([1, 3, 5]);
+      expect(result.next().value).toEqual([11, 5, 7, 13]);
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual(undefined);
     });
   });
 
-  describe('splitting an array with sub array', () => {
-    it('yields with array of splitted items correctly', () => {
-      const arr = [1, 3, 5, 7, 9, 11];
-      const iterable = splitLazy(arr, [5, 7]);
+  describe('splitting an iterator with sub iterator', () => {
+    it('should yield with array of splitted items correctly', () => {
+      function* separatorGenerator() {
+        yield 5;
+        yield 7;
+      }
 
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([9, 11]);
+      const iterable = dummyGenerator();
+      const separator = separatorGenerator();
+
+      const result = splitLazy(iterable, separator);
+
+      expect(result.next().value).toEqual([1, 3]);
+      expect(result.next().value).toEqual([9, 11]);
+      expect(result.next().value).toEqual([13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
-    it('should yield empty array first if given sub iterable is found in the beginning of iterable', () => {
-      const arr = [5, 4, 1, 3, 5, 4, 7, 9];
-      const iterable = splitLazy(arr, [5, 4]);
+    it('should yield empty array first if given separator is found in the beginning of iterable', () => {
+      function* separatorGenerator() {
+        yield 1;
+        yield 3;
+      }
 
-      expect(iterable.next().value).toEqual([]);
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([7, 9]);
+      const iterable = dummyGenerator();
+      const separator = separatorGenerator();
+      const result = splitLazy(iterable, separator);
+
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual([5, 7, 9, 11, 5, 7, 13, 7, 9]);
+      expect(result.next().value).toEqual(undefined);
     });
 
     it('should yield empty array last if given separator is found in the end of iterable', () => {
-      const arr = [1, 3, 5, 4, 7, 9, 5, 4];
-      const iterable = splitLazy(arr, [5, 4]);
+      function* separatorGenerator() {
+        yield 7;
+        yield 9;
+      }
 
-      expect(iterable.next().value).toEqual([1, 3]);
-      expect(iterable.next().value).toEqual([7, 9]);
-      expect(iterable.next().value).toEqual([]);
+      const iterable = dummyGenerator();
+      const separator = separatorGenerator();
+      const result = splitLazy(iterable, separator);
+
+      expect(result.next().value).toEqual([1, 3, 5]);
+      expect(result.next().value).toEqual([11, 5, 7, 13]);
+      expect(result.next().value).toEqual([]);
+      expect(result.next().value).toEqual(undefined);
     });
   });
+});
 
-  describe('splitting a string with splitLazyString', () => {
-    it('yields with iterable of splitted parts', () => {
-      const str = 'test/1';
-      const iterable = splitLazyString(str, '/');
+describe('splitting a string with splitLazyString', () => {
+  it('yields with iterable of splitted parts', () => {
+    const str = 'test/1';
+    const iterable = splitLazyString(str, '/');
 
-      expect(iterable.next().value).toEqual('test');
-      expect(iterable.next().value).toEqual('1');
-    });
+    expect(iterable.next().value).toEqual('test');
+    expect(iterable.next().value).toEqual('1');
+  });
 
-    it('should yield empty array first if given sub iterable is found in the beginning of iterable', () => {
-      const str = 'test/1';
-      const iterable = splitLazyString(str, 't');
+  it('should yield empty array first if given sub iterable is found in the beginning of iterable', () => {
+    const str = 'test/1';
+    const iterable = splitLazyString(str, 't');
 
-      expect(iterable.next().value).toEqual('');
-      expect(iterable.next().value).toEqual('es');
-      expect(iterable.next().value).toEqual('/1');
-    });
+    expect(iterable.next().value).toEqual('');
+    expect(iterable.next().value).toEqual('es');
+    expect(iterable.next().value).toEqual('/1');
+  });
 
-    it('should yield empty array last if given separator is found in the end of iterable', () => {
-      const str = 'test/1';
-      const iterable = splitLazyString(str, '1');
+  it('should yield empty array last if given separator is found in the end of iterable', () => {
+    const str = 'test/1';
+    const iterable = splitLazyString(str, '1');
 
-      expect(iterable.next().value).toEqual('test/');
-      expect(iterable.next().value).toEqual('');
-    });
+    expect(iterable.next().value).toEqual('test/');
+    expect(iterable.next().value).toEqual('');
   });
 });
