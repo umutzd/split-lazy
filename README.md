@@ -1,4 +1,4 @@
-# split-lazy 🗡🦭
+# split-lazy 🗡🦥
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ae3028bdccea48bf9a7b05ed91284fbd)](https://www.codacy.com/gh/miyavsu-limited/split-lazy/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=miyavsu-limited/split-lazy&amp;utm_campaign=Badge_Grade)
 ![Codacy coverage](https://img.shields.io/codacy/coverage/ae3028bdccea48bf9a7b05ed91284fbd)
