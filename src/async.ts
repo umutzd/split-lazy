@@ -18,32 +18,14 @@ export async function* asyncSplitLazyWithSeparator<
   yield yieldNext;
 }
 
-export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  subIterable: T
-): AsyncGenerator<I[], void, void>;
-export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  subIterable: I
-): AsyncGenerator<I[], void, void>;
-export function asyncSplitLazyWithSubIterator<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  subIterable: Iterable<I>
-): AsyncGenerator<I[], void, void>;
 export async function* asyncSplitLazyWithSubIterator<
   I,
   T extends AsyncIterable<I>
->(iterable: T, subIterable: unknown) {
+>(iterable: T, subIterable: I | T | Iterable<I>) {
   let yieldNext: I[] = [];
   let subIterableItems = [];
 
-  if (isIterable(subIterable)) {
-    for (const item of subIterable) {
-      subIterableItems.push(item);
-    }
-  }
-
-  if (isAsyncIterable(subIterable)) {
+  if (isAsyncIterable(subIterable) || isIterable(subIterable)) {
     for await (const item of subIterable) {
       subIterableItems.push(item);
     }
@@ -51,64 +33,48 @@ export async function* asyncSplitLazyWithSubIterator<
 
   let foundSubIterator = 0;
 
-  const iterator = iterable[Symbol.asyncIterator]();
-
-  let next = await iterator.next();
-
-  while (!next.done) {
-    if (next.value === subIterableItems[foundSubIterator]) {
-      foundSubIterator++;
-
-      if (subIterableItems.length === foundSubIterator) {
+  for await (const item of iterable) {
+    if (item === subIterableItems[foundSubIterator]) {
+      if (subIterableItems.length - 1 === foundSubIterator) {
         yield yieldNext;
         yieldNext = [];
+        foundSubIterator = 0;
+      } else {
+        foundSubIterator++;
       }
     } else {
-      foundSubIterator = 0;
-      yieldNext.push(next.value);
-    }
+      if (foundSubIterator > 0) {
+        yieldNext = yieldNext.concat(
+          subIterableItems.slice(0, foundSubIterator)
+        );
 
-    next = await iterator.next();
+        foundSubIterator = 0;
+      }
+
+      yieldNext.push(item);
+    }
   }
 
   yield yieldNext;
 }
 
-export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  separator: T
-): AsyncGenerator<I[], void, void>;
-export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  separator: Iterable<I>
-): AsyncGenerator<I[], void, void>;
-export function asyncSplitLazy<I, T extends AsyncIterable<I>>(
-  iterable: T,
-  separator: I
-): AsyncGenerator<I[], void, void>;
 export async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: unknown
 ) {
-  if (isAsyncIterable(separator)) {
+  if (isAsyncIterable(separator) || isIterable(separator)) {
     for await (const value of asyncSplitLazyWithSubIterator(
       iterable,
       separator
     )) {
       yield value;
     }
-  }
-
-  if (isIterable(separator)) {
-    for await (const value of asyncSplitLazyWithSubIterator(
+  } else {
+    for await (const value of asyncSplitLazyWithSeparator(
       iterable,
       separator
     )) {
       yield value;
     }
-  }
-
-  for await (const value of asyncSplitLazyWithSeparator(iterable, separator)) {
-    yield value;
   }
 }
