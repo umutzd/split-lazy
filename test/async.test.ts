@@ -16,7 +16,7 @@ async function* dummyGenerator() {
 
 describe('ASYNC', () => {
   describe('splitting an async iterator', () => {
-    it('yields with array of splitted items correctly', async () => {
+    it('should yield with array of splitted items correctly', async () => {
       const iterable = dummyGenerator();
       const result = asyncSplitLazy(iterable, 5);
 
@@ -55,10 +55,30 @@ describe('ASYNC', () => {
       expect((await result.next()).value).toEqual([]);
       expect((await result.next()).value).toEqual(undefined);
     });
+
+    it('should yield all elements if found nothing', async () => {
+      const iterable = dummyGenerator();
+      const result = asyncSplitLazy(iterable, 0);
+
+      expect((await result.next()).value).toEqual([
+        1,
+        3,
+        5,
+        7,
+        9,
+        11,
+        5,
+        7,
+        13,
+        7,
+        9,
+      ]);
+      expect((await result.next()).value).toEqual(undefined);
+    });
   });
 
   describe('splitting an async iterator with sub array', () => {
-    it('yields with array of splitted items correctly', async () => {
+    it('should yield with array of splitted items correctly', async () => {
       const iterable = dummyGenerator();
       const result = asyncSplitLazy(iterable, [5, 7]);
 
@@ -94,6 +114,26 @@ describe('ASYNC', () => {
       expect((await result.next()).value).toEqual([1, 3, 5]);
       expect((await result.next()).value).toEqual([11, 5, 7, 13]);
       expect((await result.next()).value).toEqual([]);
+      expect((await result.next()).value).toEqual(undefined);
+    });
+
+    it('should yield all elements if found nothing', async () => {
+      const iterable = dummyGenerator();
+      const result = asyncSplitLazy(iterable, [0]);
+
+      expect((await result.next()).value).toEqual([
+        1,
+        3,
+        5,
+        7,
+        9,
+        11,
+        5,
+        7,
+        13,
+        7,
+        9,
+      ]);
       expect((await result.next()).value).toEqual(undefined);
     });
   });
@@ -155,9 +195,32 @@ describe('ASYNC', () => {
       expect((await result.next()).value).toEqual([]);
       expect((await result.next()).value).toEqual(undefined);
     });
-  });
 
-  // 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+    it('should yield all elements if found nothing', async () => {
+      async function* separatorGenerator() {
+        yield 0;
+      }
+
+      const iterable = dummyGenerator();
+      const separator = separatorGenerator();
+      const result = asyncSplitLazy(iterable, separator);
+
+      expect((await result.next()).value).toEqual([
+        1,
+        3,
+        5,
+        7,
+        9,
+        11,
+        5,
+        7,
+        13,
+        7,
+        9,
+      ]);
+      expect((await result.next()).value).toEqual(undefined);
+    });
+  });
 
   describe('splitting an async iterator with non-async sub iterator', () => {
     it('should yield with array of splitted items correctly', async () => {
@@ -215,6 +278,31 @@ describe('ASYNC', () => {
       expect((await result.next()).value).toEqual([1, 3, 5]);
       expect((await result.next()).value).toEqual([11, 5, 7, 13]);
       expect((await result.next()).value).toEqual([]);
+      expect((await result.next()).value).toEqual(undefined);
+    });
+
+    it('should yield all elements if found nothing', async () => {
+      function* separatorGenerator() {
+        yield 0;
+      }
+
+      const iterable = dummyGenerator();
+      const separator = separatorGenerator();
+      const result = asyncSplitLazy(iterable, separator);
+
+      expect((await result.next()).value).toEqual([
+        1,
+        3,
+        5,
+        7,
+        9,
+        11,
+        5,
+        7,
+        13,
+        7,
+        9,
+      ]);
       expect((await result.next()).value).toEqual(undefined);
     });
   });
