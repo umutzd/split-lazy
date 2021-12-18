@@ -21,7 +21,7 @@ export async function* asyncSplitLazyWithSeparator<
 export async function* asyncSplitLazyWithSubIterator<
   I,
   T extends AsyncIterable<I>
->(iterable: T, subIterable: I | T | Iterable<I>) {
+>(iterable: T, subIterable: Iterable<unknown> | AsyncIterable<unknown>) {
   let yieldNext: I[] = [];
   let subIterableItems = [];
 
@@ -45,7 +45,7 @@ export async function* asyncSplitLazyWithSubIterator<
     } else {
       if (foundSubIterator > 0) {
         yieldNext = yieldNext.concat(
-          subIterableItems.slice(0, foundSubIterator)
+          subIterableItems.slice(0, foundSubIterator) as ConcatArray<I>
         );
 
         foundSubIterator = 0;
@@ -61,20 +61,20 @@ export async function* asyncSplitLazyWithSubIterator<
 export async function* asyncSplitLazy<I, T extends AsyncIterable<I>>(
   iterable: T,
   separator: unknown
-) {
+): AsyncGenerator<I[], void, unknown> {
   if (isAsyncIterable(separator) || isIterable(separator)) {
     for await (const value of asyncSplitLazyWithSubIterator(
       iterable,
       separator
     )) {
-      yield value;
+      yield value as I[];
     }
   } else {
     for await (const value of asyncSplitLazyWithSeparator(
       iterable,
       separator
     )) {
-      yield value;
+      yield value as I[];
     }
   }
 }
